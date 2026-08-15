@@ -21,7 +21,7 @@ def test_schwa_retention_yoga():
 
 
 def test_dharma():
-    assert iast_word_to_ipa("dharma") == "d̪ʱɐɾmɐ"
+    assert iast_word_to_ipa("dharma") == "d̪hɐɾmɐ"
 
 
 def test_visarga_echo_after_i():

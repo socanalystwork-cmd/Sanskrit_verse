@@ -50,7 +50,7 @@ SYSTEM_PROMPT = """You are an expert Sanskrit philologist. Analyze the given San
     }
   ]
 }
-Rules: split the verse into its surface words in order. Confidence below 0.7 means low_confidence true. Do not guess wildly; mark ambiguity honestly."""
+Rules: split the verse into its surface words in order. For long nominal compounds (samāsa), do NOT collapse them into one entry: output one entry per compound member in order (e.g. "muktāvidrumahemanīladhavalacchāyair" becomes six entries: muktā, vidruma, heman, nīla, dhavala, chāyair), each with surface set to that member segment, its own meaning, and grammar tags (pos "compound member" for non-final members; the final member carries the case/number/gender of the whole compound). Confidence below 0.7 means low_confidence true. Do not guess wildly; mark ambiguity honestly."""
 
 STRICT_SYSTEM_PROMPT = SYSTEM_PROMPT + """
 CRITICAL: Your previous response failed JSON validation. Return ONLY the raw JSON object starting with { and ending with }. No code fences, no explanation, every field present with correct types."""
@@ -174,7 +174,7 @@ async def tts(req: TTSRequest, x_elevenlabs_key: Optional[str] = Header(None)):
     try:
         el_client = AsyncElevenLabs(api_key=x_elevenlabs_key)
         stream = el_client.text_to_speech.convert(
-            text=req.text,
+            text=req.text.replace('ॐ', 'OM'),
             voice_id=req.voice_id or DEFAULT_VOICE_ID,
             model_id="eleven_multilingual_v2",
             voice_settings=VoiceSettings(stability=0.8, similarity_boost=0.8),
