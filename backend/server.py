@@ -17,7 +17,6 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
-from elevenlabs.client import AsyncElevenLabs
 
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
@@ -155,10 +154,22 @@ async def analyze(req: AnalyzeRequest):
     }
 
 
+def _el_error_message(e) -> Optional[str]:
+    body = getattr(e, "body", None)
+    if isinstance(body, dict):
+        detail = body.get("detail")
+        if isinstance(detail, dict):
+            return detail.get("message") or detail.get("status")
+        if isinstance(detail, str):
+            return detail
+    return None
+
+
 @api_router.post("/tts")
 async def tts(req: TTSRequest, x_elevenlabs_key: Optional[str] = Header(None)):
     if not x_elevenlabs_key:
         raise HTTPException(status_code=400, detail="ElevenLabs API key required")
+    from elevenlabs.client import AsyncElevenLabs
     try:
         el_client = AsyncElevenLabs(api_key=x_elevenlabs_key)
         stream = el_client.text_to_speech.convert(
@@ -176,13 +187,11 @@ async def tts(req: TTSRequest, x_elevenlabs_key: Optional[str] = Header(None)):
         raise
     except Exception as e:
         status = getattr(e, "status_code", None)
-        if status in (401, 403):
-            raise HTTPException(status_code=401, detail="Invalid ElevenLabs API key")
-        if status == 422:
-            raise HTTPException(status_code=422, detail="Invalid voice ID or request")
-        if status == 429:
-            raise HTTPException(status_code=429, detail="ElevenLabs rate limit reached")
-        raise HTTPException(status_code=502, detail="TTS generation failed")
+        msg = _el_error_message(e)
+        if not msg:
+            msg = {401: "Invalid ElevenLabs API key", 403: "ElevenLabs key lacks permission",
+                   422: "Invalid voice ID or request", 429: "ElevenLabs rate limit reached"}.get(status, "TTS generation failed")
+        raise HTTPException(status_code=status if status and 400 <= status < 600 else 502, detail=msg)
 
 
 app.include_router(api_router)
