@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Play, Pause, SpeakerHigh, CircleNotch } from "@phosphor-icons/react";
+import { Play, Pause, SpeakerHigh, CircleNotch, Timer } from "@phosphor-icons/react";
 import { toast } from "sonner";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -8,6 +8,15 @@ export const AudioControls = ({ text, elKey, elVoice }) => {
   const audioRef = useRef(null);
   const [state, setState] = useState("idle");
   const [source, setSource] = useState(null);
+  const [slow, setSlow] = useState(false);
+  const slowRef = useRef(false);
+
+  const toggleSlow = () => {
+    const next = !slow;
+    setSlow(next);
+    slowRef.current = next;
+    if (audioRef.current) audioRef.current.playbackRate = next ? 0.8 : 1.0;
+  };
 
   useEffect(() => {
     return () => {
@@ -33,7 +42,7 @@ export const AudioControls = ({ text, elKey, elVoice }) => {
     const voices = window.speechSynthesis.getVoices();
     const hi = voices.find((v) => v.lang?.startsWith("hi") || v.lang?.startsWith("sa"));
     if (hi) utter.voice = hi;
-    utter.rate = 0.75;
+    utter.rate = slowRef.current ? 0.6 : 0.75;
     utter.onend = () => setState("idle");
     utter.onerror = () => setState("idle");
     window.speechSynthesis.speak(utter);
@@ -70,6 +79,7 @@ export const AudioControls = ({ text, elKey, elVoice }) => {
       }
       const blob = await res.blob();
       const audio = new Audio(URL.createObjectURL(blob));
+      audio.playbackRate = slowRef.current ? 0.8 : 1.0;
       audio.onended = () => setState("idle");
       audioRef.current = audio;
       audio.play();
@@ -97,6 +107,19 @@ export const AudioControls = ({ text, elKey, elVoice }) => {
           <Play size={16} weight="fill" />
         )}
         {state === "playing" ? "Pause" : state === "paused" ? "Resume" : "Chant"}
+      </button>
+      <button
+        data-testid="slow-toggle"
+        onClick={toggleSlow}
+        aria-pressed={slow}
+        className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-mono-ipa uppercase tracking-wider transition-colors duration-150 focus:ring-2 focus:ring-[#E27B58]/60 ${
+          slow
+            ? "bg-[#E27B58]/15 border-[#E27B58]/60 text-[#E27B58]"
+            : "bg-white/5 border-white/10 text-[#A1A1AA] hover:text-[#F3F1E7] hover:border-white/25"
+        }`}
+      >
+        <Timer size={14} weight={slow ? "fill" : "regular"} />
+        Slow
       </button>
       <span data-testid="tts-source-indicator" className="inline-flex items-center gap-1.5 text-xs font-mono-ipa text-[#A1A1AA]">
         <SpeakerHigh size={14} />

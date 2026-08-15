@@ -170,12 +170,14 @@ async def tts(req: TTSRequest, x_elevenlabs_key: Optional[str] = Header(None)):
     if not x_elevenlabs_key:
         raise HTTPException(status_code=400, detail="ElevenLabs API key required")
     from elevenlabs.client import AsyncElevenLabs
+    from elevenlabs import VoiceSettings
     try:
         el_client = AsyncElevenLabs(api_key=x_elevenlabs_key)
         stream = el_client.text_to_speech.convert(
             text=req.text,
             voice_id=req.voice_id or DEFAULT_VOICE_ID,
             model_id="eleven_multilingual_v2",
+            voice_settings=VoiceSettings(stability=0.8, similarity_boost=0.8),
         )
         audio = b""
         async for chunk in stream:
