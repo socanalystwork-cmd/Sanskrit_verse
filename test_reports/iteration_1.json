@@ -1,0 +1,41 @@
+{
+  "summary": "Full-stack testing of Sanskrit Verse Teacher completed. Backend: 8/8 pytest cases pass covering /api/health, /api/analyze (Devanagari + IAST happy paths, empty/>500-char validation), IPA determinism spot-check (नमः -> n̪ɐmɐhɐ), and /api/tts error paths (400 no key, 401 invalid key). Real LLM (gpt-5.6-sol via EMERGENT_LLM_KEY) confirmed non-mocked: returned correct translation 'Dharma protects those who protect it.' with per-word grammar {pos:noun, tags:[nominative,singular,masculine], root:dharma}, sandhi_split ['dharmaḥ'], overall_confidence 0.99. Frontend: sample chip -> Analyze -> loading skeleton -> translation-text, ipa-line, overall-confidence 99%, 3 word-cards all rendered; script-badge switches Devanagari/IAST correctly; char-counter updates; Voice settings dialog opens, key+voice inputs saveable, key NOT persisted to localStorage (verified — only PostHog analytics present); Chant button without key triggered sonner toast 'No ElevenLabs key set — using browser voice' and tts-source-indicator flipped to 'Browser voice'. No console errors, no crashes.",
+  "ai_feature_verdicts": [
+    "primary: /api/analyze LLM word-by-word Sanskrit analysis - pass - evidence: HTTP 200 in ~15-20s, translation='Dharma protects those who protect it.' / 'Dharma, when protected, protects.', overall_confidence=0.99, 3 words each with real grammar (pos=noun, tags=[nominative,singular,masculine], root=dharma), sandhi_split=['dharmaḥ'], deterministic ipa='d̪ʱɐɾmoː'. curl POST /api/analyze - skill: ai-testing-llm",
+    "IPA deterministic engine (verse-level) - pass - evidence: 'नमः' -> ipa='n̪ɐmɐhɐ' (visarga echo + full schwa retention), 'धर्मो रक्षति रक्षितः' -> ipa='d̪ʱɐɾmoː ɾɐkʂɐt̪i ɾɐkʂit̪ɐhɐ', 12 pre-existing unit tests pass - skill: none (deterministic, not LLM)",
+    "/api/tts ElevenLabs error paths - pass (blocked on happy path: no real ElevenLabs key available - by design per review request) - evidence: no header -> 400 'ElevenLabs API key required'; header 'sk_fake123' -> 401 'Invalid ElevenLabs API key' - skill: ai-testing-audio (loaded conceptually; happy path intentionally out of scope)",
+    "Chant browser SpeechSynthesis fallback UI - pass - evidence: no key set -> click play-audio-btn -> sonner toast text 'No ElevenLabs key set — using browser voice' visible, tts-source-indicator text transitioned 'Browser fallback' -> 'Browser voice', no console errors (headless browser voice output is not audibly verifiable but code path executed cleanly) - skill: ai-testing-audio"
+  ],
+  "skills_loaded": ["ai-testing-core", "ai-testing-llm"],
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_api.py",
+    "/app/backend/tests/test_ipa.py",
+    "/app/test_reports/pytest/pytest_api.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py: motor MongoDB client + DB_NAME are imported/initialized but never used (spec says stateless, MongoDB unused). Consider removing the mongo_url/client/db lines to avoid confusion and startup dependency on MongoDB. Non-blocking.",
+    "server.py /api/tts: getattr(e, 'status_code', None) may miss ElevenLabs SDK exception classes that carry the status under a different attribute (e.g. e.response.status_code or e.body). Currently observed to work for 401 with 'sk_fake123', but worth verifying against real 429/422 responses. Non-blocking.",
+    "@app.on_event('shutdown') is deprecated in FastAPI 0.100+; consider migrating to lifespan handler. Non-blocking.",
+    "parse_analysis strips code fences only on leading '```'; a trailing '```' or 'json' between fences might not be handled in all cases. STRICT retry does hard-instruct the model to avoid fences so this is low-risk."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_api.py (new)"
+  ],
+  "success_rate": {"backend": "100% (8/8 pytest)", "frontend": "100% (all data-testid flows verified)"},
+  "test_credentials": "N/A - stateless app, no auth",
+  "seed_data_creation": "None - stateless",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend regression suite: /app/backend/tests/test_api.py (8 tests) + /app/backend/tests/test_ipa.py (12 tests). Run: `cd /app/backend && python -m pytest tests/ -v`. LLM calls take 15-20s each. No real ElevenLabs key available; only 400/401 error paths tested. Frontend uses REACT_APP_BACKEND_URL from /app/frontend/.env. All key elements have data-testid attributes (verse-input, script-badge, char-counter, sample-verse-{0,1,2}, analyze-btn, loading-state, error-state, analysis-result, translation-text, ipa-line, overall-confidence, word-card-{i}, low-confidence-badge-{i}, elevenlabs-settings, elevenlabs-key-input, elevenlabs-voice-input, save-settings-btn, play-audio-btn, tts-source-indicator, word-grid).",
+  "rca of the issue": "No issues found."
+}

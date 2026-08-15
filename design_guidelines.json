@@ -1,0 +1,100 @@
+{
+  "theme": "dark",
+  "archetype": "LUXURY / ORGANIC & EARTHY (Scholarly Obsidian)",
+  "typography": {
+    "headings": {
+      "family": "Cormorant Garamond, serif",
+      "weight": "font-light to font-medium",
+      "tracking": "tracking-tight",
+      "usage": "Verse display, full-verse translation, major section titles."
+    },
+    "body": {
+      "family": "Manrope, sans-serif",
+      "weight": "font-normal",
+      "usage": "General UI, settings, buttons, instructions."
+    },
+    "mono": {
+      "family": "JetBrains Mono, monospace",
+      "weight": "font-normal",
+      "usage": "Grammar tags, IPA phonetic text, Sandhi splits."
+    }
+  },
+  "colors": {
+    "background": "#0A0A0C",
+    "surface": "#121215",
+    "surface_glass": "rgba(18, 18, 21, 0.75)",
+    "primary": "#E27B58",
+    "primary_hover": "#C96544",
+    "text_main": "#F3F1E7",
+    "text_muted": "#A1A1AA",
+    "border": "#27272A",
+    "grammar_noun": "#4ADE80",
+    "grammar_verb": "#60A5FA",
+    "low_confidence": "#F59E0B",
+    "error_state": "#EF4444"
+  },
+  "visual_enhancers": {
+    "shadows": "Use ambient glows rather than hard drop shadows. Example: shadow-[0_0_15px_rgba(226,123,88,0.15)] for the currently playing word.",
+    "borders": "1px solid border-white/10 on word cards. Use a subtle gradient border for the ElevenLabs config panel to signify technology integration.",
+    "textures": "Incorporate the provided weathered paper image with mix-blend-overlay at 4-5% opacity across the background to eliminate the 'flat digital' feel and evoke ancient manuscripts."
+  },
+  "layouts": {
+    "main_container": "Max-width 5xl, generously padded (p-6 md:p-12 lg:p-16), left or naturally aligned.",
+    "input_section": "Textarea should feel expansive, like writing on a scholarly slate. Internal padding of p-6 or p-8.",
+    "analysis_grid": "High-Density 'Bento' Grid for word cards: grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6. Let the cards flow naturally.",
+    "verse_display": "Massive text for the original verse (text-3xl to text-5xl). Left-aligned. Use leading-loose to accommodate complex Devanagari diacritics."
+  },
+  "components": {
+    "word_card": "Flat Solid Surface. bg-[#121215] with 1px border-[#27272A]. Internal padding p-6. Top: Sanskrit word (Serif text-xl), Middle: Meaning (Sans text-base text-text_muted), Bottom: Grammar Tags.",
+    "grammar_tag": "Small pill shape, text-[11px] font-mono tracking-wider uppercase, bg-white/5 border border-white/10.",
+    "play_button": "Pill-shaped, bg-primary text-white hover:bg-primary_hover. Include a subtle scale-up animation on hover.",
+    "settings_panel": "Crystal Glass variant. backdrop-blur-xl bg-black/60, border-white/10. Used for the ElevenLabs API Key and Voice ID inputs.",
+    "confidence_badge": "Subtle top-border accent on the word card or a small dot indicator. Use #F59E0B (Amber) for low confidence."
+  },
+  "motion": {
+    "word_cards": "Staggered fade-up using framer-motion. delay: index * 0.05.",
+    "hover_states": "Interactive cards lift slightly (-translate-y-1) and their border brightens to border-white/30.",
+    "audio_playback": "When audio is playing, highlight the currently spoken word card with a primary colored border or subtle background tint."
+  },
+  "images": [
+    {
+      "category": "empty_state_background",
+      "url": "https://images.unsplash.com/photo-1648717008621-ee7e6acfe270",
+      "description": "Weathered beige grunge paper. Use as a fixed background texture (opacity 5%, mix-blend-overlay, z-[-1]) behind the main app container.",
+      "implementation": "fixed inset-0 pointer-events-none object-cover w-full h-full"
+    },
+    {
+      "category": "meditative_hero",
+      "url": "https://images.unsplash.com/photo-1463134836706-8bcc60f7d78b",
+      "description": "Calm water abstract. Use as a masked header background or prominently in the 'Analysis unavailable' error state.",
+      "implementation": "mask-image: linear-gradient(to bottom, black, transparent); max-h-[40vh] object-cover"
+    }
+  ],
+  "accessibility": {
+    "contrast": "Ensure all grammar tags and primary colors meet APCA/WCAG 3:1 minimums against the #121215 background. Check terracotta against dark gray.",
+    "focus": "All interactive elements MUST have focus:ring-2 focus:ring-primary focus:outline-none.",
+    "motion": "Respect prefers-reduced-motion for the staggered card entrances."
+  },
+  "instructions_to_main_agent": [
+    "Install required fonts from Google Fonts: 'Cormorant Garamond' (weights 300, 400, 500), 'Manrope' (weights 400, 500, 600), and 'JetBrains Mono'.",
+    "Install @phosphor-icons/react for scholarly/elegant icons.",
+    "Use framer-motion for staggering the word-by-word analysis cards on load.",
+    "Configure the ElevenLabs API key input inside a Shadcn Dialog. Keep this stateless (save to localStorage or memory).",
+    "Ensure the Textarea for verse input has a generous minimum height, allows vertical scrolling, and has a character counter (cap at 500).",
+    "Use 'sonner' for TTS fallback warnings or 'API key missing' notifications.",
+    "DO NOT apply generic global transitions. Be deliberate with motion.",
+    "Use data-testid on all interactive elements (e.g., data-testid='analyze-btn', data-testid='play-audio-btn', data-testid='elevenlabs-settings').",
+    "Handle the 'Analysis unavailable' state gracefully, utilizing the meditative hero image to maintain visual quality even on failure."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Do not use generic centered layouts. Use optical alignment.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) for sticky headers or floating panels.",
+    "DO NOT apply universal transition (e.g., transition: all).",
+    "DO NOT center align the app container in App.css (.App { text-align: center; } MUST be removed).",
+    "Always use modern button styles (pill-shaped) with interaction animations.",
+    "NEVER use AI assistant Emoji characters for icons.",
+    "Use 2-3x more spacing than typical designs. Cramped designs look cheap.",
+    "Use @phosphor-icons/react or lucide-react, do not use raw SVGs unless strictly necessary."
+  ]
+}

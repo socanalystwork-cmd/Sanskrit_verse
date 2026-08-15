@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+Devanagari:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --bg: #0a0a0c;
+    --surface: #121215;
+    --primary-c: #e27b58;
+    --primary-hover: #c96544;
+    --text-main: #f3f1e7;
+    --text-muted: #a1a1aa;
+    --border-c: #27272a;
+    --low-conf: #f59e0b;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg);
+    color: var(--text-main);
+    font-family: 'Manrope', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.font-serif-display {
+    font-family: 'Cormorant Garamond', 'Noto Serif Devanagari', serif;
+}
+
+.font-deva {
+    font-family: 'Noto Serif Devanagari', 'Cormorant Garamond', serif;
+}
+
+.font-mono-ipa {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+::selection {
+    background: rgba(226, 123, 88, 0.35);
+    color: #fff;
+}
+
+textarea:focus,
+input:focus,
+button:focus-visible {
+    outline: none;
+}
+
+@layer base {
+    :root {
+        --background: 240 9% 4%;
+        --foreground: 48 33% 93%;
+        --card: 240 8% 8%;
+        --card-foreground: 48 33% 93%;
+        --popover: 240 8% 8%;
+        --popover-foreground: 48 33% 93%;
+        --primary: 15 70% 62%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 240 5% 12%;
+        --secondary-foreground: 48 33% 93%;
+        --muted: 240 5% 12%;
+        --muted-foreground: 240 5% 64%;
+        --accent: 240 5% 12%;
+        --accent-foreground: 48 33% 93%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 6% 16%;
+        --input: 240 6% 16%;
+        --ring: 15 70% 62%;
+        --radius: 0.5rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-up {
+    animation: fadeUp 0.5s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fade-up {
+        animation: none;
+    }
+}
+
+@layer base {
+    [data-debug-wrapper="true"] {
+        display: contents !important;
+    }
+
+    [data-debug-wrapper="true"] > * {
+        margin-left: inherit;
+        margin-right: inherit;
+        margin-top: inherit;
+        margin-bottom: inherit;
+        padding-left: inherit;
+        padding-right: inherit;
+        padding-top: inherit;
+        padding-bottom: inherit;
+        column-gap: inherit;
+        row-gap: inherit;
+        gap: inherit;
+        border-left-width: inherit;
+        border-right-width: inherit;
+        border-top-width: inherit;
+        border-bottom-width: inherit;
+        border-left-style: inherit;
+        border-right-style: inherit;
+        border-top-style: inherit;
+        border-bottom-style: inherit;
+        border-left-color: inherit;
+        border-right-color: inherit;
+        border-top-color: inherit;
+        border-bottom-color: inherit;
+    }
+}
