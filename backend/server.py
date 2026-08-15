@@ -135,7 +135,7 @@ async def analyze(req: AnalyzeRequest):
         except Exception as e:
             logger.error(f"LLM call error on attempt {attempt + 1}: {type(e).__name__}")
     if analysis is None:
-        raise HTTPException(status_code=502, detail="Analysis unavailable")
+        raise HTTPException(status_code=424, detail="Analysis unavailable")
 
     for w in analysis.words:
         w.confidence = max(0.0, min(1.0, w.confidence))
@@ -193,7 +193,7 @@ async def tts(req: TTSRequest, x_elevenlabs_key: Optional[str] = Header(None)):
         if not msg:
             msg = {401: "Invalid ElevenLabs API key", 403: "ElevenLabs key lacks permission",
                    422: "Invalid voice ID or request", 429: "ElevenLabs rate limit reached"}.get(status, "TTS generation failed")
-        raise HTTPException(status_code=status if status and 400 <= status < 600 else 502, detail=msg)
+        raise HTTPException(status_code=status if status and 400 <= status < 600 and status not in (502, 504) else 424, detail=msg)
 
 
 app.include_router(api_router)
